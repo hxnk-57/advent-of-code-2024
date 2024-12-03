@@ -1,4 +1,4 @@
-file_path = "input/00.txt"
+file_path = "input/04-test.txt"
 
 with open(file_path, 'r') as file:    
     lines = [line.strip() for line in file]
