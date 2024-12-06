@@ -57,12 +57,30 @@ def fix_updates(invalid_updates):
 
 def part_two() -> int:
     update = fix_updates(invalid_updates)
-    for i in range(5):
+    for i in range(3):
         update = fix_updates(update)
 
     return middle_element_sum(update)
 
+# Create a function that check validity.
+# Call this function repeatidly until a line becomes valid
 
 if __name__ == "__main__":
     print(f"Part One: {part_one()}") # 4774 143
     print(f"Part Two: {part_two()}") # 6004 123
+
+#def day5(s, part2=False):
+#   p1, p2 = s.split('\n\n')
+#   rules = [tuple(line.split('|')) for line in p1.splitlines()]
+#   updates = (line.split(',') for line in p2.splitlines())
+
+#   def compare(a, b):
+#     return -1 if (a, b) in rules else 1 if (b, a) in rules else 0
+
+#   total = 0
+#   for update in updates:
+#     new = sorted(update, key=functools.cmp_to_key(compare))
+#     if (new == update) ^ part2:
+#       total += int(new[len(new) // 2])
+
+#   return total
