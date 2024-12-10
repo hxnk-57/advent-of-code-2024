@@ -2,12 +2,6 @@ file_path = "input/10.txt"
 
 grid = [[]]
 
-with open(file_path, 'r') as file:
-    rows = [line.strip() for line in file]
-    grid = [[int(char) for char in line] for line in rows]
-
-ROWS, COLUMNS = len(grid), len(grid[0])
-
 
 def find_trail_heads(grid):
     trail_heads = []
@@ -17,6 +11,14 @@ def find_trail_heads(grid):
                 trail_heads.append((row, column))
     return trail_heads
 
+
+with open(file_path, 'r') as file:
+    rows = [line.strip() for line in file]
+    grid = [[int(char) for char in line] for line in rows]
+
+ROWS, COLUMNS = len(grid), len(grid[0])
+
+trail_heads = find_trail_heads(grid)
 
 def calculate_trail_head_score(start, part_2 = False):
     valid_paths = set()
@@ -46,10 +48,8 @@ def calculate_trail_head_score(start, part_2 = False):
 
     return len(valid_paths)
 
-
 def part_one() -> int:
     total = 0
-    trail_heads = find_trail_heads(grid)
     for head in trail_heads:
         total += calculate_trail_head_score(head)
     return total
