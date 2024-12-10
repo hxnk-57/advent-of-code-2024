@@ -1,6 +1,7 @@
 file_path = "input/08.txt"
 
 from collections import defaultdict
+import math
 
 grid = [[]]
 
@@ -18,47 +19,44 @@ for row in range(ROWS):
             antennas[grid[row][column]].append((row,column))
 
 
+def colinear(x1, y1, x2, y2, x3, y3):
+    area = abs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2))
+    return area == 0
 
-def valid_distance(dr1, dc1, dr2, dc2) -> bool:
-    return dr1 * dc2 == dc1 * dr2
+
+def valid_distance(d1, d2) -> bool:
+    return d1 == 2 * d2 or (d2 == 2 * d1)
 
 
 def part_one() -> int:
     anti_nodes = set()
-    for row in range(ROWS):
-        for column in range(COLUMNS):
-            for antenna, coordinates in antennas.items():
+    for candidate_row in range(ROWS):
+        for candidate_column in range(COLUMNS):
+            for _, coordinates in antennas.items():
                 for (antenna_1_row, antenna_1_column) in coordinates:
                     for (antenna_2_row, antenna_2_column) in coordinates:
                         if (antenna_1_row, antenna_1_column) == (antenna_2_row, antenna_2_column):
                             continue
 
-                        d1 = abs(row - antenna_1_row) + abs(column - antenna_1_column)
-                        d2 = abs(row - antenna_2_row) + abs(column - antenna_2_column)
+                        d1 = math.sqrt((candidate_row - antenna_1_row) ** 2 + (candidate_column - antenna_1_column) ** 2)
+                        d2 = math.sqrt((candidate_row - antenna_2_row) ** 2 + (candidate_column - antenna_2_column) ** 2)
 
-                        dr1, dc1 = row - antenna_1_row, column - antenna_1_column
-                        dr2, dc2 = row - antenna_2_row, column - antenna_2_column
-                        
-                        if valid_distance(dr1, dc1, dr2, dc2) and ((d1 == 2 * d2) or (d2 == 2 * d1)):
-                            anti_nodes.add((row, column))
-                        
+                        if colinear(antenna_1_row, antenna_1_column, antenna_2_row, antenna_2_column, candidate_row, candidate_column) and valid_distance(d1, d2):
+                            anti_nodes.add((candidate_row, candidate_column))               
     return len(anti_nodes)
 
 def part_two() -> int:
     anti_nodes = set()
-    for row in range(ROWS):
-        for column in range(COLUMNS):
-            for antenna, coordinates in antennas.items():
+    for candidate_row in range(ROWS):
+        for candidate_column in range(COLUMNS):
+            for _, coordinates in antennas.items():
                 for (antenna_1_row, antenna_1_column) in coordinates:
                     for (antenna_2_row, antenna_2_column) in coordinates:
                         if (antenna_1_row, antenna_1_column) == (antenna_2_row, antenna_2_column):
                             continue
 
-                        dr1, dc1 = row - antenna_1_row, column - antenna_1_column
-                        dr2, dc2 = row - antenna_2_row, column - antenna_2_column
-
-                        if collinear(dr1, dc1, dr2, dc2):
-                            anti_nodes.add((row, column))
+                        if colinear(antenna_1_row, antenna_1_column, antenna_2_row, antenna_2_column, candidate_row, candidate_column):
+                            anti_nodes.add((candidate_row, candidate_column))
 
     return len(anti_nodes) 
 
