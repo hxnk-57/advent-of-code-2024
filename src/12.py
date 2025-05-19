@@ -1,83 +1,88 @@
 file_path = "input/12.txt"
 
-grid = [[]]
+with open(file_path, 'r') as file:
+        rows = [line.strip() for line in file]
 
-with open(file_path, 'r') as file:    
-    rows = [line.strip() for line in file]
-    grid = [[pot for pot in line] for line in rows]
+def display_grid(grid):
+    for row in grid:
+        print("".join(row))
+
+grid = [[column for column in row] for row in rows]
 
 ROWS, COLUMNS = len(grid), len(grid[0])
 
-def display_grid(g):
-    for r in g:
-        print(r)
 
-
-def deep_copy(g):
-    return [row[:] for row in g] 
-
-perimeter_grid = deep_copy(grid)
-
-def calculate_perimiter(row, column, plant_type):
+def calculate_perimeter(row, column, plant_type):
     perimeter = 0
-    # Check all four sides for boundaries or different plant types
     for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        nr, nc = row + dr, column + dc
-        if nr < 0 or nr >= ROWS or nc < 0 or nc >= COLUMNS:
-            # Out of bounds contributes to the perimeter
+        new_row, new_column = row + dr, column + dc
+        if new_row < 0 or new_row >= ROWS or new_column < 0 or new_column >= COLUMNS:
             perimeter += 1
-        elif perimeter_grid[nr][nc] != plant_type:
-            # Neighboring cell is of a different type
+        elif grid[new_row][new_column] != plant_type:
             perimeter += 1
-
     return perimeter
 
 
-def score(row, column, plant_type) -> int:
-    plant_locations = set()
-    connected = set()  # To track visited cells
+def calculate_sides(row, column, plant_type, grid):
+    rows, columns = len(grid), len(grid[0])
+    # row and up/down
+    # column and left/right
+    sides = set()
 
-    # Start from the initial cell
+
+    return len(sides)
+
+def score(row, column, plant_type, grid, visited):
+    plant_locations = set()
+    connected = set()
     plant_locations.add((row, column))
-    grid[row][column] = -1  # Mark as visited
+    visited[row][column] = True
 
     while plant_locations:
         r, c = plant_locations.pop()
         connected.add((r, c))
 
-        # Check all four neighbors
         for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            nr, nc = r + dr, c + dc
-            if (0 <= nr < ROWS and 0 <= nc < COLUMNS and 
-                grid[nr][nc] == plant_type and (nr, nc) not in connected):
-                plant_locations.add((nr, nc))
-                grid[nr][nc] = -1  # Mark as visited
+            new_row, new_column = r + dr, c + dc
+            if (0 <= new_row < ROWS and 0 <= new_column < COLUMNS and
+                grid[new_row][new_column] == plant_type and not visited[new_row][new_column]):
+                plant_locations.add((new_row, new_column))
+                visited[new_row][new_column] = True
 
-    perimiter = 0
-    for r, c  in connected:
-        perimiter += calculate_perimiter(r, c, plant_type)
+    perimeter = 0
+    for r, c in connected:
+        perimeter += calculate_perimeter(r, c, plant_type)
 
     area = len(connected)
+    print(f"{plant_type}: Area = {area}, Perimeter = {perimeter}, Score = {area * perimeter}")
+    return area * perimeter
 
-    print(plant_type, ":", area ,"x", perimiter, "=", area * perimiter)
-    return area * perimiter
+def part_one(file_path):
+    visited = [[False for _ in range(COLUMNS)] for _ in range(ROWS)]
+    total_score = 0
 
-    
-def part_one() -> int:
-    total = 0
-    current_plant = ""
-    for row in range(ROWS):
-        for column in range(COLUMNS):
-            if grid[row][column] != current_plant and grid[row][column] != -1:
-                current_plant = grid[row][column]
-                total += score(row, column, current_plant)
-            display_grid(grid)
-    return total
+    for row in range(len(grid)):
+        for column in range(len(grid[0])):
+            if not visited[row][column]:
+                total_score += score(row, column, grid[row][column], grid, visited)
+
+    print("Total Score:", total_score)
+    return total_score
 
 
-def part_two() -> int:
-    return 
+def part_two(file_path):
+    visited = [[False for _ in range(len(grid[0]))] for _ in range(len(grid))]
+    total_score = 0
+
+    for row in range(len(grid)):
+        for column in range(len(grid[0])):
+            if not visited[row][column]:
+                total_score += score(row, column, grid[row][column], grid, visited)
+
+    print("Total Score:", total_score)
+    return total_score
+
 
 if __name__ == "__main__":
-    print(f"Part One: {part_one()}")
-    print(f"Part Two: {part_two()}")
+    print(f"Part One: {part_one(file_path)}") # 1449902
+   # print(f"Part Two: {part_two(file_path)}") # 
